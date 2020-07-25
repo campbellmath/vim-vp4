@@ -23,6 +23,7 @@
 "         file0.txt     //main/parent/child
 "         file1.txt     //main/parent/child
 "     file2.txt         //main/parent
+set shell=/bin/bash
 let s:directory_data = {}
 
 " line number to directory prefix map
