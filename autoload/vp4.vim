@@ -594,11 +594,7 @@ function! s:PerforceAnnotateFull(lbegin, lend)
             let cl_data = split(s:PerforceSystem('change -o ' . line), '\n')
 
             try
-                let description_index = match(cl_data, '^Description')
-                let data[line]['description'] = substitute(join(cl_data[description_index + 1:-1]),
-                        \ "\t", "", "g")
-
-                " Format: 'Date:\t<date> <time>'
+                " Format: 'Date:\t<date>'
                 let date_index = match(cl_data, '^Date')
                 let date = split(split(cl_data[date_index], '\t')[1], ' ')[0]
                 let data[line]['date'] = date
@@ -619,24 +615,9 @@ function! s:PerforceAnnotateFull(lbegin, lend)
             endtry
         endif
 
-        " Small state machine to display the description for the current
-        " changelist.  First line shows the date and user, subsequent lines show
-        " the continue description, if it exceeds one line.
-        let LEN = 70
-        if line != last_cl
-            let idx = 0
-            call setline(lnr, ' '
-                    \ . ' ' . data[line]['date']
+        call setline(lnr, line
                     \ . ' ' . data[line]['user']
-                    \ . ' ' . line
-                    \ )
-        else
-            let description = strpart(data[line]['description'], idx, LEN)
-            call setline(lnr, s:Pad(description, LEN)
-                    \ . ' ' .line
-                    \ )
-            let idx += LEN
-        endif
+                    \ . ' ' . data[line]['date'])
 
         let last_cl = line
         let lnr = nextnonblank(lnr + 1)
@@ -683,13 +664,13 @@ function! vp4#PerforceAnnotate(...) range
 
     " Clean up buffer, set local options, move cursor to saved position
     set modifiable
-    %right 80
+    %right 27
     setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap
     setlocal nonumber norelativenumber
     call s:PerforceAnnotateHighlight()
     call setpos('.', saved_curpos)
     set cursorbind scrollbind
-    vertical resize 80
+    vertical resize 27
     set nomodifiable
 
     " q to exit
